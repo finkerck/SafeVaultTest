@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SafeVault - Secure Input Form</title>
+</head>
+<body>
+  <form action="/submit" method="post" autocomplete="off">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" minlength="3" maxlength="50" pattern="[A-Za-z0-9_.-]+" required>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" maxlength="100" required>
+
+    <button type="submit">Submit</button>
+  </form>
+</body>
+</html>
