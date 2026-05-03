@@ -52,8 +52,8 @@ public class TestInputValidation
 
         Assert.Multiple(() =>
         {
-            Assert.That(validationResult.SanitizedUsername, Does.Not.Contain("<"));
-            Assert.That(validationResult.SanitizedUsername, Does.Not.Contain(">"));
+            Assert.That(validationResult.IsValid, Is.False);
+            Assert.That(validationResult.SanitizedUsername, Is.EqualTo(string.Empty));
             Assert.That(encodedOutput, Does.Not.Contain("<script>"));
             Assert.That(encodedOutput, Does.Contain("&lt;script&gt;"));
         });

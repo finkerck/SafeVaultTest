@@ -12,12 +12,14 @@ public sealed class InputValidationService
     {
         var errors = new List<string>();
 
-        var sanitizedUsername = SanitizeUsername(username);
+        var normalizedUsername = NormalizeUsername(username);
+        var sanitizedUsername = normalizedUsername;
         var sanitizedEmail = SanitizeEmail(email);
 
-        if (string.IsNullOrWhiteSpace(sanitizedUsername) || !UsernameAllowedPattern.IsMatch(sanitizedUsername))
+        if (string.IsNullOrWhiteSpace(normalizedUsername) || !UsernameAllowedPattern.IsMatch(normalizedUsername))
         {
             errors.Add("Username must be 3-50 chars and contain only letters, numbers, underscore, dash, or dot.");
+            sanitizedUsername = string.Empty;
         }
 
         if (!IsValidEmail(sanitizedEmail))
@@ -67,7 +69,7 @@ public sealed class InputValidationService
         return HtmlEncoder.Default.Encode(value ?? string.Empty);
     }
 
-    private static string SanitizeUsername(string? username)
+    private static string NormalizeUsername(string? username)
     {
         if (string.IsNullOrWhiteSpace(username))
         {
@@ -76,9 +78,7 @@ public sealed class InputValidationService
 
         var cleaned = username.Trim();
         cleaned = Regex.Replace(cleaned, "[\\x00-\\x1F\\x7F]", string.Empty);
-        cleaned = Regex.Replace(cleaned, "[^a-zA-Z0-9_.-]", string.Empty);
-
-        return cleaned.Length > 50 ? cleaned[..50] : cleaned;
+        return cleaned;
     }
 
     private static string SanitizeEmail(string? email)
