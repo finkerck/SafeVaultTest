@@ -6,3 +6,6 @@
 .vs/
 *.user
 *.suo
+
+# Local data files
+*.db

@@ -25,6 +25,39 @@ Activity 1, Activity 2, and Activity 3 implementation for SafeVault secure codin
 dotnet test SafeVault.slnx
 ```
 
+## Run the API
+
+```bash
+dotnet run --project SafeVault.Api --urls http://localhost:5057
+```
+
+## Quick manual API checks
+
+1. Register a user
+
+```powershell
+Invoke-RestMethod -Uri "http://localhost:5057/register" -Method Post -ContentType "application/json" -Body '{"username":"user1","email":"user1@example.com","password":"StrongP@ss!1","role":"User"}'
+```
+
+2. Log in
+
+```powershell
+$login = Invoke-RestMethod -Uri "http://localhost:5057/login" -Method Post -ContentType "application/json" -Body '{"username":"user1","password":"StrongP@ss!1"}'
+$token = $login.accessToken
+```
+
+3. Call an authenticated route
+
+```powershell
+Invoke-RestMethod -Uri "http://localhost:5057/me" -Headers @{ Authorization = "Bearer $token" } -Method Get
+```
+
+4. Admin-only route (requires Admin role token)
+
+```powershell
+Invoke-RestMethod -Uri "http://localhost:5057/admin/dashboard" -Headers @{ Authorization = "Bearer $token" } -Method Get
+```
+
 ## Activity 3 Security Debug Summary
 
 ### Vulnerabilities identified
