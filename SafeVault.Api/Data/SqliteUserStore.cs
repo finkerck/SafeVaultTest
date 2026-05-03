@@ -1,4 +1,5 @@
 using Microsoft.Data.Sqlite;
+using SafeVault.Api.Models;
 using SafeVault.Core.Security;
 
 namespace SafeVault.Api.Data;
@@ -100,5 +101,33 @@ public sealed class SqliteUserStore : IUserCredentialStore
         }
 
         return new AuthUserRecord(userId, foundUsername, passwordHash, role, isActive);
+    }
+
+    public async Task<IReadOnlyList<UserListItem>> ListUsersAsync(CancellationToken cancellationToken = default)
+    {
+        var users = new List<UserListItem>();
+
+        await using var connection = new SqliteConnection(_connectionString);
+        await connection.OpenAsync(cancellationToken);
+
+        var command = connection.CreateCommand();
+        command.CommandText = @"
+            SELECT UserID, Username, Email, Role, IsActive
+            FROM Users
+            ORDER BY UserID;";
+
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        while (await reader.ReadAsync(cancellationToken))
+        {
+            var userId = reader.GetInt32(reader.GetOrdinal("UserID"));
+            var username = reader.GetString(reader.GetOrdinal("Username"));
+            var email = reader.GetString(reader.GetOrdinal("Email"));
+            var role = reader.GetString(reader.GetOrdinal("Role"));
+            var isActive = reader.GetInt32(reader.GetOrdinal("IsActive")) == 1;
+
+            users.Add(new UserListItem(userId, username, email, role, isActive));
+        }
+
+        return users;
     }
 }

@@ -127,6 +127,13 @@ app.MapGet("/admin/dashboard", () =>
 })
 .RequireAuthorization("AdminOnly");
 
+app.MapGet("/admin/users", async (SqliteUserStore userStore) =>
+{
+    var users = await userStore.ListUsersAsync();
+    return Results.Ok(users);
+})
+.RequireAuthorization("AdminOnly");
+
 app.MapGet("/me", (System.Security.Claims.ClaimsPrincipal user) =>
 {
     return Results.Ok(new

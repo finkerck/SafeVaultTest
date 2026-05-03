@@ -1,0 +1,94 @@
+@baseUrl = http://localhost:5057
+
+### Health
+GET {{baseUrl}}/health
+Accept: application/json
+
+### Register admin user
+POST {{baseUrl}}/register
+Content-Type: application/json
+
+{
+  "username": "admin_http",
+  "email": "admin_http@example.com",
+  "password": "StrongP@ss!1",
+  "role": "Admin"
+}
+
+### Register normal user
+POST {{baseUrl}}/register
+Content-Type: application/json
+
+{
+  "username": "user_http",
+  "email": "user_http@example.com",
+  "password": "StrongP@ss!1",
+  "role": "User"
+}
+
+### Login as admin (copy accessToken)
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "username": "admin_http",
+  "password": "StrongP@ss!1"
+}
+
+### Login as normal user (copy accessToken)
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "username": "user_http",
+  "password": "StrongP@ss!1"
+}
+
+### Set tokens manually after login responses
+@adminToken = REPLACE_WITH_ADMIN_ACCESS_TOKEN
+@userToken = REPLACE_WITH_USER_ACCESS_TOKEN
+
+### Current user profile (admin token)
+GET {{baseUrl}}/me
+Authorization: Bearer {{adminToken}}
+Accept: application/json
+
+### Admin dashboard (admin token should pass)
+GET {{baseUrl}}/admin/dashboard
+Authorization: Bearer {{adminToken}}
+Accept: application/json
+
+### List users (admin token should pass)
+GET {{baseUrl}}/admin/users
+Authorization: Bearer {{adminToken}}
+Accept: application/json
+
+### Admin dashboard (user token should fail with 403)
+GET {{baseUrl}}/admin/dashboard
+Authorization: Bearer {{userToken}}
+Accept: application/json
+
+### List users (user token should fail with 403)
+GET {{baseUrl}}/admin/users
+Authorization: Bearer {{userToken}}
+Accept: application/json
+
+### SQL injection style login attempt (should fail 401)
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "username": "admin_http' OR '1'='1",
+  "password": "StrongP@ss!1"
+}
+
+### XSS payload in register (should fail validation)
+POST {{baseUrl}}/register
+Content-Type: application/json
+
+{
+  "username": "<script>alert('xss')</script>",
+  "email": "xss@example.com",
+  "password": "StrongP@ss!1",
+  "role": "User"
+}
